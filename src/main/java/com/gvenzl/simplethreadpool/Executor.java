@@ -11,25 +11,25 @@ public class Executor
 	private boolean terminated = false;
 	private boolean running = false;
 	
-	private Runnable submission;
+	private Class<? extends Runnable> submission;
 	
 	public Executor() {
 		super();
 	}
 	
 	public Executor(Runnable task) {
-		submission = task;
+		submission = task.getClass();
 	}
 	
 	public Executor(int poolSize, Runnable task) {
 		threadPoolSize = poolSize;
-		submission = task;
+		submission = task.getClass();
 	}
 	
 	public Executor(int poolSize, int maxPoolSize, Runnable task) {
 		threadPoolSize = poolSize;
 		maxThreadPoolSize = maxPoolSize;
-		submission = task;
+		submission = task.getClass();
 	}
 	
 	/**
@@ -47,9 +47,16 @@ public class Executor
 		if(running) {
 			if (size > threadPoolSize) {
 				for (int i=threadPoolSize; i<=size; i++) {
-					Thread t = new Thread(submission);
-					t.start();
-					pool.add(t);
+					Thread t;
+					try{
+						t = new Thread(submission.newInstance());
+						t.start();
+						pool.add(t);
+					}
+					catch (InstantiationException | IllegalAccessException e) {
+						shutdown();
+						e.printStackTrace();
+					}
 				}
 			}
 			else if (size < threadPoolSize) {
@@ -111,14 +118,16 @@ public class Executor
 	 * @param task The task to work on.
 	 */
 	public void submit(Runnable task) {
-		submission = task;
+		submission = task.getClass();
 	}
 
 	/**
 	 * Runs the tasks within the pool
 	 * @throws IllegalStateException One of the following: <br/> <li>submission is null</li>
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
-	public void run() throws IllegalStateException {
+	public void run() throws IllegalStateException, InstantiationException, IllegalAccessException {
 		if (null == submission) {
 			throw new IllegalStateException("No submission passed");
 		}
@@ -126,9 +135,16 @@ public class Executor
 		pool = new LinkedList<Thread>();
 		for (int i=1; i<=threadPoolSize &&
 				      i<=maxThreadPoolSize; i++) {
-			Thread t = new Thread(submission);
-			t.start();
-			pool.add(t);
+			Thread t;
+			try {
+				t = new Thread(submission.newInstance());
+				t.start();
+				pool.add(t);
+			}
+			catch(InstantiationException | IllegalAccessException e) {
+				shutdown();
+				e.printStackTrace();
+			}
 		}
 		
 		running = true;
