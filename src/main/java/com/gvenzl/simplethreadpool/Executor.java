@@ -13,23 +13,22 @@ public class Executor
 	
 	private Class<? extends Runnable> submission;
 	
-	public Executor() {
-		super();
+	public Executor(Class<? extends Runnable> task) {
+		pool = new LinkedList<Thread>();
+		submission = task;
 	}
 	
-	public Executor(Runnable task) {
-		submission = task.getClass();
-	}
-	
-	public Executor(int poolSize, Runnable task) {
+	public Executor(int poolSize, Class<? extends Runnable> task) {
 		threadPoolSize = poolSize;
-		submission = task.getClass();
+		pool = new LinkedList<Thread>();
+		submission = task;
 	}
 	
-	public Executor(int poolSize, int maxPoolSize, Runnable task) {
+	public Executor(int poolSize, int maxPoolSize, Class<? extends Runnable> task) {
 		threadPoolSize = poolSize;
 		maxThreadPoolSize = maxPoolSize;
-		submission = task.getClass();
+		pool = new LinkedList<Thread>();
+		submission = task;
 	}
 	
 	/**
@@ -46,7 +45,7 @@ public class Executor
 		// Only if the pool is currently running resize it
 		if(running) {
 			if (size > threadPoolSize) {
-				for (int i=threadPoolSize; i<=size; i++) {
+				for (int i=threadPoolSize; i<size; i++) {
 					Thread t;
 					try{
 						t = new Thread(submission.newInstance());
@@ -62,7 +61,7 @@ public class Executor
 			else if (size < threadPoolSize) {
 				LinkedList<Thread> kill = new LinkedList<Thread>();
 				// Interrupt all the threads at once until the threadPoolSize is equal to the new size
-				for (int i=threadPoolSize; i==size; i--) {
+				for (int i=threadPoolSize; i>size; i--) {
 					Thread t = pool.remove();
 					t.interrupt();
 					kill.add(t);
@@ -117,8 +116,8 @@ public class Executor
 	 * Thread safety is not guaranteed.
 	 * @param task The task to work on.
 	 */
-	public void submit(Runnable task) {
-		submission = task.getClass();
+	public void submit(Class<? extends Runnable> task) {
+		submission = task;
 	}
 
 	/**
@@ -128,27 +127,28 @@ public class Executor
 	 * @throws InstantiationException 
 	 */
 	public void run() throws IllegalStateException, InstantiationException, IllegalAccessException {
-		if (null == submission) {
-			throw new IllegalStateException("No submission passed");
-		}
-		
-		pool = new LinkedList<Thread>();
-		for (int i=1; i<=threadPoolSize &&
-				      i<=maxThreadPoolSize; i++) {
-			Thread t;
-			try {
-				t = new Thread(submission.newInstance());
-				t.start();
-				pool.add(t);
+		if (!running) {
+			if (null == submission) {
+				throw new IllegalStateException("No submission passed");
 			}
-			catch(InstantiationException | IllegalAccessException e) {
-				shutdown();
-				e.printStackTrace();
+	
+			for (int i=pool.size(); i< threadPoolSize &&
+					      i<= maxThreadPoolSize; i++) {
+				Thread t;
+				try {
+					t = new Thread(submission.newInstance());
+					t.start();
+					pool.add(t);
+				}
+				catch(InstantiationException | IllegalAccessException e) {
+					shutdown();
+					e.printStackTrace();
+				}
 			}
+			
+			running = true;
+			terminated = false;
 		}
-		
-		running = true;
-		terminated = false;
 	}
 	
 	/**

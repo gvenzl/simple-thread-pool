@@ -15,15 +15,14 @@ public class TestExecutor
 	
 	@Before
 	public void setup() {
-		exec = new Executor();
+		exec = new Executor(Thread.class);
 	}
 	
 	@Test
 	public void test_instantiation() {
-		new Executor();
-		new Executor(new Thread());
-		new Executor(1, new Thread());
-		new Executor(1, 1, new Thread());
+		new Executor(Thread.class);
+		new Executor(1, Thread.class);
+		new Executor(1, 1, Thread.class);
 	}
 	
 	@Test
