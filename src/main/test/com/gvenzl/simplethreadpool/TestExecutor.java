@@ -7,6 +7,21 @@ import org.junit.Test;
 public class TestExecutor
 {
 	private Executor exec;
+
+	/**
+	 * Dummy class to run JUnit tests on shutdown/run
+	 * @author gvenzl
+	 *
+	 */
+	static public class TestClass implements Runnable {
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) { }
+		}
+		
+	}
 	
 	@Before
 	public void setup() {
@@ -51,21 +66,11 @@ public class TestExecutor
 		exec.run();
 	}
 
+
 	@Test public void test_isRunningTrue() throws Exception {
-		class Test implements Runnable {
-			public Test () {
-				
-			}
-			public void run() {
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException e) { }
-			}
-		}
-		Executor execTemp = new Executor(Test.class);
-// TODO: Throws exception when running but it shouldn't
-//		execTemp.run();
-//		Assert.assertTrue(execTemp.isRunning());
+		Executor execTemp = new Executor(TestClass.class);
+		execTemp.run();
+		Assert.assertTrue(execTemp.isRunning());
 	}
 	@Test
 	public void test_isRunningFalse() {
@@ -78,8 +83,12 @@ public class TestExecutor
 	}
 	
 	@Test
-	public void test_isTerminatedTrue() {
-		//TODO: Implement isTerminated == true test
+	public void test_isTerminatedTrue() throws Exception {
+		exec.submit(TestClass.class);
+		exec.run();
+		exec.shutdown();
+		
+		Assert.assertTrue(exec.isTerminated());
 	}
 
 	@Test
@@ -108,5 +117,33 @@ public class TestExecutor
 		
 		exec.submit(Test.class);
 		exec.run();
+	}
+	
+	@Test
+	public void test_runIncreasePoolSize() throws Exception {
+		int initPoolSize = 1;
+		int maxPoolSize = 10;
+		
+		exec.setMaxPoolSize(maxPoolSize);
+		exec.setPoolSize(initPoolSize);
+		exec.submit(TestClass.class);
+		exec.run();
+		Assert.assertTrue(exec.getPoolSize() == initPoolSize);
+		exec.setPoolSize(maxPoolSize);
+		Assert.assertTrue(exec.getPoolSize() == maxPoolSize);
+	}
+
+	@Test
+	public void test_runDecreasePoolSize() throws Exception {
+		int lowLevelPoolSize = 1;
+		int maxPoolSize = 10;
+		
+		exec.setMaxPoolSize(maxPoolSize);
+		exec.setPoolSize(maxPoolSize);
+		exec.submit(TestClass.class);
+		exec.run();
+		Assert.assertTrue(exec.getPoolSize() == maxPoolSize);
+		exec.setPoolSize(lowLevelPoolSize);
+		Assert.assertTrue(exec.getPoolSize() == lowLevelPoolSize);
 	}
 }
