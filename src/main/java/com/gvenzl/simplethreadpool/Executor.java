@@ -8,8 +8,8 @@ import java.util.LinkedList;
  * @author gvenzl
  *
  */
-public class Executor
-{
+public class Executor {
+
 	/**
 	 * Holds the thread pool.
 	 */
@@ -19,6 +19,7 @@ public class Executor
 	 * Thread pool size.
 	 */
 	private int threadPoolSize = Integer.MAX_VALUE;
+	
 	/**
 	 * Maximum thread pool size.
 	 * This is a control mechanism to make sure the system cannot
@@ -45,32 +46,33 @@ public class Executor
 	private Class<? extends Runnable> submission;
 	
 	/**
-	 * Returns an {@code Executor} instance
+	 * Returns an {@code Executor} instance.
 	 * @param task The Runnable to execute within the thread pool.
 	 */
-	public Executor(Class<? extends Runnable> task) {
+	public Executor(final Class<? extends Runnable> task) {
 		pool = new LinkedList<Thread>();
 		submission = task;
 	}
 	
 	/**
-	 * Returns an {@code Executor} instance
+	 * Returns an {@code Executor} instance.
 	 * @param poolSize The thread pool size
 	 * @param task The Runnable to execute within the thread pool.
 	 */
-	public Executor(int poolSize, Class<? extends Runnable> task) {
+	public Executor(final int poolSize, final Class<? extends Runnable> task) {
 		threadPoolSize = poolSize;
 		pool = new LinkedList<Thread>();
 		submission = task;
 	}
 	
 	/**
-	 * Returns an {@code Executor} instance
+	 * Returns an {@code Executor} instance.
 	 * @param poolSize The thread pool size
 	 * @param maxPoolSize The maximum thread pool size
 	 * @param task The Runnable to execute within the thread pool.
 	 */
-	public Executor(int poolSize, int maxPoolSize, Class<? extends Runnable> task) {
+	public Executor(final int poolSize, final int maxPoolSize,
+						final Class<? extends Runnable> task) {
 		threadPoolSize = poolSize;
 		maxThreadPoolSize = maxPoolSize;
 		pool = new LinkedList<Thread>();
@@ -78,27 +80,28 @@ public class Executor
 	}
 	
 	/**
-	 * Sets the thread pool size
+	 * Sets the thread pool size.
 	 * @param size The size of the thread pool
-	 * @throws IllegalArgumentException An {@code IllegalArgumentExcpetion} is thrown
-	 * if the pool size is greater than the max pool size.
+	 * @throws IllegalArgumentException An {@code IllegalArgumentExcpetion}
+	 * is thrown if the pool size is greater than the max pool size.
 	 */
-	public void setPoolSize(int size) throws IllegalArgumentException {
+	public final void setPoolSize(final int size)
+			throws IllegalArgumentException {
 		if (size > maxThreadPoolSize) {
-			throw new IllegalArgumentException("Thread pool size greater than max thread pool size");
+			throw new IllegalArgumentException(
+						"Thread pool size greater than max thread pool size");
 		}
 	
 		// Only perform actual resizing if the pool is currently running.
-		if(running) {
+		if (running) {
 			if (size > threadPoolSize) {
-				for (int i=threadPoolSize; i<size; i++) {
+				for (int i = threadPoolSize; i < size; i++) {
 					Thread t;
-					try{
+					try {
 						t = new Thread(submission.newInstance());
 						t.start();
 						pool.add(t);
-					}
-					catch (InstantiationException | IllegalAccessException e) {
+					} catch (InstantiationException | IllegalAccessException e) {
 						shutdown();
 						e.printStackTrace();
 					}
@@ -117,8 +120,7 @@ public class Executor
 				for (Thread t : kill) {
 					try {
 						t.join();
-					}
-					catch (InterruptedException e) {
+					} catch (InterruptedException e) {
 						// Interrupted, break loop
 						break;
 					}
@@ -130,10 +132,10 @@ public class Executor
 	}
 	
 	/**
-	 * Returns the thread pool size
+	 * Returns the thread pool size.
 	 * @return The thread pool size
 	 */
-	public int getPoolSize() {
+	public final int getPoolSize() {
 		return threadPoolSize;
 	}
 	
@@ -143,7 +145,7 @@ public class Executor
 	 * exceed the max thread pool size.
 	 * @param maxSize The maximum number of threads within the pool
 	 */
-	public void setMaxPoolSize(int maxSize) {
+	public final void setMaxPoolSize(final int maxSize) {
 		maxThreadPoolSize = maxSize;
 	}
 	
@@ -151,7 +153,7 @@ public class Executor
 	 * Returns the maximum thread pool size.
 	 * @return The maximum thread pool size.
 	 */
-	public int getMaxPoolSize() {
+	public final int getMaxPoolSize() {
 		return maxThreadPoolSize;
 	}
 	
@@ -162,18 +164,20 @@ public class Executor
 	 * Thread safety is not guaranteed.
 	 * @param task The task to work on.
 	 */
-	public void submit(Class<? extends Runnable> task) {
+	public final void submit(final Class<? extends Runnable> task) {
 		submission = task;
 	}
 
 	/**
-	 * Runs the tasks within the pool
-	 * @throws IllegalStateException One of the following: <br/> <li>submission is null</li>
+	 * Runs the tasks within the pool.
+	 * @throws IllegalStateException One of the following:
+	 * <br/> <li>submission is null</li>
 	 * @throws IllegalAccessException 
-	 * @throws InstantiationException The Executor couldn't create a new instance for the submission.
+	 * @throws InstantiationException The Executor couldn't create
+	 * a new instance for the submission.
 	 * This happens normally when there is no default constructor.
 	 */
-	public void run() throws IllegalStateException, InstantiationException, IllegalAccessException {
+	public final void run() throws IllegalStateException, InstantiationException, IllegalAccessException {
 		if (!running) {
 			if (null == submission) {
 				throw new IllegalStateException("No submission passed");
@@ -202,8 +206,8 @@ public class Executor
 	 * Shuts the thread pool down in a graceful manner.
 	 * The task submitted have to respond to the thread interrupt.
 	 */
-	public void shutdown() {
-		while(!pool.isEmpty()) {
+	public final void shutdown() {
+		while (!pool.isEmpty()) {
 			Thread t = pool.remove();
 			t.interrupt();
 		}
@@ -216,7 +220,7 @@ public class Executor
 	 * @return <b>True</b> if the thread pool is terminated (pool had to be started first). <br/>
 	 * <b>False</b> if the pool has not been terminated or started.
 	 */
-	public boolean isTerminated() {
+	public final boolean isTerminated() {
 		return terminated;
 	}
 	
@@ -225,7 +229,7 @@ public class Executor
 	 * @return <b>True</b> if the thread pool is currently running. <br/>
 	 * <b>False</b> if the thread pool has not been started yet or terminated.
 	 */
-	public boolean isRunning() {
+	public final boolean isRunning() {
 		return running;
 	}
 }
