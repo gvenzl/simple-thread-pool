@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>SimpleThreadPool</groupId>
   <artifactId>SimpleThreadPool</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <name>SimpleThreadPool</name>
   <description>A simple dynamically resizlabe thread pool</description>
   <build>
