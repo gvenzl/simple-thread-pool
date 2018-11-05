@@ -1,9 +1,9 @@
-#SimpleThreadPool
+# SimpleThreadPool
 
-#Overview
+# Overview
 A simple Java thread pool which is dynamically resizable during runtime.
 
-#Usage
+# Usage
 A thread pool which executes a simple task in multiple threads.
 The pool allows to be dynamically resized during runtime.
 This is particular convenient when one would like to run
@@ -17,7 +17,7 @@ the task until the user stops the workload.
 The thread pool provides mechanism to stop the thread pool
 but it is for the Runnable to act on the stop signal.
 
-#Examples
+# Examples
 Following a simple example of how to use SimpleThreadPool.
 
 ## Creating a thread pool
