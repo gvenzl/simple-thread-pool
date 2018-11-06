@@ -1,3 +1,25 @@
+/*
+ * Since: December, 2014
+ * Author: gvenzl
+ * Name: Executor.java
+ * Description:
+ *
+ * Copyright (c) 2018 Gerald Venzl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.gvenzl.simplethreadpool;
 
 import java.util.LinkedList;
@@ -50,7 +72,7 @@ public class Executor {
 	 * @param task The Runnable to execute within the thread pool.
 	 */
 	public Executor(final Class<? extends Runnable> task) {
-		pool = new LinkedList<Thread>();
+		pool = new LinkedList<>();
 		submission = task;
 	}
 	
@@ -60,9 +82,7 @@ public class Executor {
 	 * @param task The Runnable to execute within the thread pool.
 	 */
 	public Executor(final int poolSize, final Class<? extends Runnable> task) {
-		threadPoolSize = poolSize;
-		pool = new LinkedList<Thread>();
-		submission = task;
+		this(poolSize, poolSize, task);
 	}
 	
 	/**
@@ -73,10 +93,9 @@ public class Executor {
 	 */
 	public Executor(final int poolSize, final int maxPoolSize,
 						final Class<? extends Runnable> task) {
-		threadPoolSize = poolSize;
+		this(task);
+	    threadPoolSize = poolSize;
 		maxThreadPoolSize = maxPoolSize;
-		pool = new LinkedList<Thread>();
-		submission = task;
 	}
 	
 	/**
@@ -108,7 +127,7 @@ public class Executor {
 				}
 			}
 			else if (size < threadPoolSize) {
-				LinkedList<Thread> kill = new LinkedList<Thread>();
+				LinkedList<Thread> kill = new LinkedList<>();
 				// Interrupt all the threads at once until the threadPoolSize is equal to the new size
 				for (int i=threadPoolSize; i>size; i--) {
 					Thread t = pool.remove();

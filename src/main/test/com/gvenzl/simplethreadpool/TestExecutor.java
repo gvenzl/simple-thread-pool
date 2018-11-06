@@ -1,3 +1,25 @@
+/*
+ * Since: December, 2014
+ * Author: gvenzl
+ * Name: TestExecutor.java
+ * Description:
+ *
+ * Copyright (c) 2018 Gerald Venzl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.gvenzl.simplethreadpool;
 
 import org.junit.Assert;
@@ -44,7 +66,7 @@ public class TestExecutor
 	public void test_getMaxPoolSize () {
 		int maxSize = 10;
 		exec.setMaxPoolSize(maxSize);
-		Assert.assertTrue(maxSize == exec.getMaxPoolSize());
+		Assert.assertEquals(maxSize, exec.getMaxPoolSize());
 	}
 	
 	@Test
@@ -52,13 +74,15 @@ public class TestExecutor
 		int poolSize = 10;
 		exec.setMaxPoolSize(poolSize);
 		exec.setPoolSize(poolSize);
-		Assert.assertTrue(poolSize == exec.getPoolSize());
+		Assert.assertEquals(poolSize, exec.getPoolSize());
 	}
 	
 	@Test
 	public void test_setPoolSize() {
-		exec.setMaxPoolSize(1);
-		exec.setPoolSize(1);
+	    int poolSize = 1;
+		exec.setMaxPoolSize(poolSize);
+		exec.setPoolSize(poolSize);
+		Assert.assertEquals(poolSize, exec.getPoolSize());
 	}
 
 	@Test
@@ -128,9 +152,9 @@ public class TestExecutor
 		exec.setPoolSize(initPoolSize);
 		exec.submit(TestClass.class);
 		exec.run();
-		Assert.assertTrue(exec.getPoolSize() == initPoolSize);
+		Assert.assertEquals(initPoolSize, exec.getPoolSize());
 		exec.setPoolSize(maxPoolSize);
-		Assert.assertTrue(exec.getPoolSize() == maxPoolSize);
+		Assert.assertEquals(maxPoolSize, exec.getPoolSize());
 	}
 
 	@Test
@@ -142,8 +166,8 @@ public class TestExecutor
 		exec.setPoolSize(maxPoolSize);
 		exec.submit(TestClass.class);
 		exec.run();
-		Assert.assertTrue(exec.getPoolSize() == maxPoolSize);
+		Assert.assertEquals(maxPoolSize, exec.getPoolSize());
 		exec.setPoolSize(lowLevelPoolSize);
-		Assert.assertTrue(exec.getPoolSize() == lowLevelPoolSize);
+		Assert.assertEquals(lowLevelPoolSize, exec.getPoolSize());
 	}
 }

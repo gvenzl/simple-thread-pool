@@ -5,7 +5,7 @@
     </properties>
   <groupId>com.gvenzl</groupId>
   <artifactId>simplethreadpool</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <name>SimpleThreadPool</name>
   <description>A simple dynamically resizable thread pool</description>
   <build>
